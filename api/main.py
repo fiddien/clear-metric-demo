@@ -1,8 +1,6 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, render_template
 from parse import Sentence
 from score import ClearMetric
-from time import time
-import json, os
 import re
 
 app = Flask('app', template_folder='template')
@@ -27,8 +25,6 @@ def inference():
         return render_template('index.html', result=build_result(sents, scores))
     except AssertionError:
         return render_template('index.html', result="Please use the <code>&#60;sep&#62;</code> tag to submit multiple sentences.")
-
-
 
 
 def build_result(sents, scores):
@@ -81,8 +77,5 @@ def build_result(sents, scores):
     
     return s
 
-
-
-
-if __name__=='__main__':
-    app.run(debug=True, host='0.0.0.0', port=9696)
+# if __name__=='__main__':
+#     app.run(debug=True, host='0.0.0.0', port=9696)
