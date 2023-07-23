@@ -2,13 +2,14 @@ import spacy, benepar
 import amrlib
 from amrlib.graph_processing.annotator import add_lemmas, annotate_penman, load_spacy
 from amrlib.alignments.rbw_aligner import RBWAligner
+import penman
 
 spacy_model_name = 'en_core_web_md'
 nlp, stog = None, None
 
-def load_models(mode=['spacy', 'amr']):
+def load_models(mode=['syntax', 'semantic']):
     # Lazy loader
-    if 'spacy' in mode:
+    if 'syntax' in mode:
         global nlp
         if not nlp:
             model = spacy.load(spacy_model_name)
@@ -23,7 +24,7 @@ def load_models(mode=['spacy', 'amr']):
         else:
             return nlp
 
-    if 'amr' in mode:
+    if 'semantic' in mode:
         global stog
         if not stog:
             model = amrlib.load_stog_model()
@@ -138,12 +139,34 @@ class GraphAligner:
             else:
                 relations[edge.source][edge.target] = edge.role
         return relations
+    
+    
+    def _get_concept(self, var):
+        for v, role, concept in self.graphs[self.idx].instances():
+            if v==var:
+                return concept
 
 
-    @staticmethod
-    def _check_alignment(alignment, role, v1, v2):
+    def _check_alignment(self, idx, alignment, role, v1, v2, vs=None):
+
+        if vs:
+            s_list, t_list = [], []
+
+            a, b = self._check_alignment(idx, alignment, role, v1, v2)
+            if not (a and b):
+                return [], []
+            
+            if v2 in role:
+                for v3 in vs:
+                    # print('INSIDE', self._get_concept(idx, v2), self._get_concept(idx, v3))
+                    if v2!=v3 and v3 in role[v2] and ':op' in role[v2][v3]:
+                        if v2 in alignment and v3 in alignment:
+                            s_list.append(v2)
+                            t_list.append(v3)
+            return s_list, t_list
 
         if role[v1][v2]==':ARG0':
+            path = [':ARG0']
             
             # Check if v1 and v2 are aligned
             if v1 in alignment: 
@@ -160,6 +183,7 @@ class GraphAligner:
                                 return alignment[v1], alignment[v2_child]
         
         elif role[v1][v2]==':ARG0-of':
+            path = [':ARG0-of']
             
             # Check if v1 and v2 are aligned
             if v1 in alignment: 
@@ -171,8 +195,24 @@ class GraphAligner:
                     # v2 is not aligned, check its children?
                     pass
         
-        return None, None
-                        
+        return [], []
+    
+
+    def tree(self, var):
+        edges = self.graphs[self.idx].edges(source=var)
+        return var, [(e.role, self.tree(e.target)) for e in edges]
+    
+    def get_ancestor(self, tree, d=1, role=None):
+        # print('INSIDE', d, tree)
+        var, branch = tree
+        ind = [(var, role)]# if branch==[] else []
+        # print('\tIND', ind)
+        for family in branch:
+            role, child = family
+            ind.extend(self.get_ancestor(child, d=d+1, role=role))
+            # print('\t\tIND', ind)
+        return ind
+
 
     def get_actn_char(self):
         """
@@ -180,39 +220,56 @@ class GraphAligner:
             (list) candidates of action and character pairs
         """
         for idx, aligned in enumerate(self.align_var):
+            self.idx = idx
             
             role = self._get_role_map(idx)
-            candidates = []
-            
-            for source in role.keys():
-                
-                for target in role[source]:
+            cand = []
+            # print('GRAPH', penman.encode(self.graphs[idx]))
+            # print('ALIGNED', aligned)
+            for e in self.graphs[idx].edges():
+                v1, v2 = e.source, e.target
 
-                    act, char = self._check_alignment(aligned, role, source, target)
-                    if act:
-                        candidates.append({
-                                'action': act, 
-                                'character': char
-                            })
+                if e.role == ':ARG0':
+
+                    if v1 in aligned:
+
+                        if self._get_concept(v2) in ['and']:
+                            tree = self.tree(v2)
+                            ancestors = self.get_ancestor(tree)
+                            vars = [v for v, r in ancestors \
+                                     if r and (v in aligned) and (':ARG' not in r)]
+                            for v in vars:
+                                cand.append({'action': aligned[v1], 'character': aligned[v]})
+
+                        elif v2 in aligned:
+                            cand.append({'action': aligned[v1], 'character': aligned[v2]})
+                        else:
+                            # What could possibly goes here?
+                            pass
+
+                elif e.role == ':ARG0-of':
+    
+                    if v2 in aligned:
+                        if v1 in aligned:
+                            cand.append({'action': aligned[v2], 'character': aligned[v1]})
                     
-            yield candidates
+            yield cand
 
 
 # === Syntatic parsing happens here to analyse get the verb and subject of the sentence ===
 class Sentence:
     def __init__(self, sentences, syntax_model=None, semantic_model=None):
         if not syntax_model:
-            syntax_model = load_models('spacy')
+            syntax_model = load_models('syntax')
 
         self.docs = self.parse_syntax(syntax_model, sentences)
         self.structures = self.get_structures()
 
         if not semantic_model:
-            semantic_model = load_models('amr')
+            semantic_model = load_models('semantic')
 
         self.amrs = self.parse_semantic(semantic_model, sentences)
         self.stories = list(self.amrs.get_actn_char())
-
 
 
     def __len__(self):
@@ -261,21 +318,23 @@ class Sentence:
 
     def parse_syntax(self, syntax_model, sentences):        
         if isinstance(sentences, list) and isinstance(sentences[0], str):
-            for i, sent in enumerate(sentences):
-                sent = sent.strip()
-                if sent[-1] not in '.?!':
-                    sentences[i] = sent + '.'
+            if len(sentences) > 1:
+                for i, sent in enumerate(sentences):
+                    sent = sent.strip()
+                    if sent[-1] not in '.?!':
+                        sentences[i] = sent + '.'
             sentences_str = " ".join(sentences)
             doc = syntax_model(sentences_str)
             assert len(list(doc.sents)) == len(sentences)
         else:
             doc = syntax_model(sentences)
-        return doc
-        
+        return doc        
 
 
     def parse_semantic(self, semantic_model, sentences):
-        return GraphAligner(semantic_model([s.text for s in self.docs.sents]), self.docs)
+        if hasattr(self, 'docs'):
+            return GraphAligner(semantic_model([s.text for s in self.docs.sents]), self.docs)
+        return GraphAligner(semantic_model([s.text for s in sentences]), sentences)
     
 
     def to_json_format(self, scores=None):

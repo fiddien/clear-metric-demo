@@ -5,9 +5,11 @@ import re
 
 app = Flask('app', template_folder='template')
 
+
 @app.route('/', methods=['GET']) # Homepage
 def home():
     return render_template('index.html')
+
 
 @app.route('/inference', methods=['POST'])
 def inference():
@@ -54,7 +56,7 @@ def build_result(sents, scores):
                 s += sent_str[:subj_start] + subj_str + sent_str[subj_end:verb_start] + verb_str + sent_str[verb_end:]
                 s += '<hr>'
         else:
-            s += f"{sent_str}<br>(No pair of subject and verb found.)<hr>"
+            s += f"{sent_str}<br>(No pair of subject and verb found)<hr>"
 
         if story:
             for item in story:
@@ -73,9 +75,9 @@ def build_result(sents, scores):
                     s += sent_str[:actn_start] + actn_str + sent_str[actn_end:char_start] + char_str + sent_str[char_end:]
                 s += '<hr>'
         else:
-            s += f"{sent_str}<br>(No pair of character and action found.)"
+            s += f"{sent_str}<br>(No pair of character and action found)"
     
     return s
 
-# if __name__=='__main__':
-#     app.run(debug=True, host='0.0.0.0', port=9696)
+if __name__=='__main__':
+    app.run(debug=True, host='0.0.0.0', port=9696)
