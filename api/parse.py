@@ -158,7 +158,6 @@ class GraphAligner:
             
             if v2 in role:
                 for v3 in vs:
-                    # print('INSIDE', self._get_concept(idx, v2), self._get_concept(idx, v3))
                     if v2!=v3 and v3 in role[v2] and ':op' in role[v2][v3]:
                         if v2 in alignment and v3 in alignment:
                             s_list.append(v2)
@@ -203,14 +202,11 @@ class GraphAligner:
         return var, [(e.role, self.tree(e.target)) for e in edges]
     
     def get_ancestor(self, tree, d=1, role=None):
-        # print('INSIDE', d, tree)
         var, branch = tree
-        ind = [(var, role)]# if branch==[] else []
-        # print('\tIND', ind)
+        ind = [(var, role)]
         for family in branch:
             role, child = family
             ind.extend(self.get_ancestor(child, d=d+1, role=role))
-            # print('\t\tIND', ind)
         return ind
 
 
@@ -224,8 +220,6 @@ class GraphAligner:
             
             role = self._get_role_map(idx)
             cand = []
-            # print('GRAPH', penman.encode(self.graphs[idx]))
-            # print('ALIGNED', aligned)
             for e in self.graphs[idx].edges():
                 v1, v2 = e.source, e.target
 
@@ -233,9 +227,8 @@ class GraphAligner:
 
                     if v1 in aligned:
 
-                        if self._get_concept(v2) in ['and']:
-                            tree = self.tree(v2)
-                            ancestors = self.get_ancestor(tree)
+                        if self._get_concept(v2) in ['and', 'person']:
+                            ancestors = self.get_ancestor(self.tree(v2))
                             vars = [v for v, r in ancestors \
                                      if r and (v in aligned) and (':ARG' not in r)]
                             for v in vars:
