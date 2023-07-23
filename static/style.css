@@ -115,7 +115,7 @@ input:focus {
 .btn:hover { 
 	text-decoration: none; 
 	background-color: #8e8e8e3e;
-	color: var(--background-dark)
+	color: var(--background-dark);
 	-webkit-transition: background-position 0.1s linear; 
 	-moz-transition: background-position 0.1s linear; 
 	-ms-transition: background-position 0.1s linear; 

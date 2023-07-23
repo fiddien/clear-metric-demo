@@ -1,36 +1,34 @@
-import spacy, benepar
+import spacy
+# import benepar
 import amrlib
 from amrlib.graph_processing.annotator import add_lemmas, annotate_penman, load_spacy
 from amrlib.alignments.rbw_aligner import RBWAligner
-import penman
+import os
 
-spacy_model_name = 'en_core_web_md'
-nlp, stog = None, None
+spacy_model_name = 'en_core_web_sm'
+spacy_nlp, stog = None, None
+dir_path = os.path.dirname(os.path.realpath(__file__))
+amrlib_model_path = os.path.join(dir_path, 'static/model_parse_xfm_bart_base-v0_1_0')
 
 def load_models(mode=['syntax', 'semantic']):
     # Lazy loader
     if 'syntax' in mode:
-        global nlp
-        if not nlp:
+        global spacy_nlp
+        if not spacy_nlp:
             model = spacy.load(spacy_model_name)
-            try:
-                model.add_pipe('benepar', config={'model': 'benepar_en3'})
-            except:
-                benepar.download('benepar_en3')
-                model.add_pipe('benepar', config={'model': 'benepar_en3'})
             load_spacy(spacy_model_name)
-            nlp = model
-            return model
+            spacy_nlp = model
+            return spacy_nlp
         else:
-            return nlp
+            return spacy_nlp
 
     if 'semantic' in mode:
         global stog
         if not stog:
-            model = amrlib.load_stog_model()
+            model = amrlib.load_stog_model(amrlib_model_path)
             model = model.parse_sents
             stog = model
-            return model
+            return stog
         else:
             return stog
 
