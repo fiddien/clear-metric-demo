@@ -10,35 +10,35 @@
 </head>
 <body>
   <div class="header">
-    <a href="/"><h1>Predict Characters and Actions</h1></a>
+    <a href="/"><h1>Analyse the Clarity</h1></a>
     of a Sentence
   </div>
  <div class="form">
    <form action="{{ url_for('inference')}}"method="POST">
-        <label id='examples' for="option">
-          <select class="dropdown" name="option">
-            <option value="" disabled selected>Choose from examples...</option>
-            <option value="I have a dream.">
-              I have a dream.
-            </option>
-            <option value="One morning I shot an elephant in my pajamas.<sep>How he got into my pajamas I'll never know.">
-              One morning I shot an elephant in my pajamas.<sep> How he got into my pajamas I'll never know.
-            </option>
-            <option value="Little Red Riding Hood was walking to the woods when the wolf suddenly jumps and frighten her.">
-              Little Red Riding Hood was walking to the woods when the wolf suddenly jumps and frighten her.
-            </option>
-            <option value="We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data (Vaswani et al., 2017)">
-              We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.
-            </option>
-            <option value="Even the humble ambition, which I long cherished, of making sketches of those places which interested me, from a defect of eye or of hand was totally ineffectual (Sir Walter Scott)">
-              Even the humble ambition, which I long cherished, of making sketches of those places which interested me, from a defect of eye or of hand was totally ineffectual.
-            </option>
-          </select>
-        </label>
-      <input type="text" name="sent" placeholder="This is the 1st sentence.<sep>This is the 2nd." />
-        <button type="submit" class="btn btn-primary btn-block" onclick="document.getElementById(loading).style.display='block';">
-          Predict
-        </button>
+      <input type="text" name="sent" placeholder="Write your sentences..." />
+      <label id='examples' for="option">
+        <select class="dropdown" name="option">
+          <option class="option-placeholder" value="" disabled selected>Choose from examples...</option>
+          <option value="I have a dream.">
+            I have a dream.
+          </option>
+          <option value="One morning I shot an elephant in my pajamas. How he got into my pajamas, I'll never know.">
+            One morning I shot an elephant in my pajamas. How he got into my pajamas, I'll never know.
+          </option>
+          <option value="Little Red Riding Hood was walking to the woods when the wolf suddenly jumps and frighten her.">
+            Little Red Riding Hood was walking to the woods when the wolf suddenly jumps and frighten her.
+          </option>
+          <option value="We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data (Vaswani et al., 2017)">
+            We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.
+          </option>
+          <option value="Even the humble ambition, which I long cherished, of making sketches of those places which interested me, from a defect of eye or of hand was totally ineffectual (Sir Walter Scott)">
+            Even the humble ambition, which I long cherished, of making sketches of those places which interested me, from a defect of eye or of hand was totally ineffectual.
+          </option>
+        </select>
+      </label>
+      <button type="submit" class="btn btn-primary btn-block" onclick="document.getElementById(loading).style.display='block';">
+        Predict
+      </button>
       <!-- <input type="checkbox" name="with_ca" value="with_ca" checked class="checkbox"> Check Characters & Actions-->
       <!-- <div id="loading" class="loader" style="display:none"></div> -->
     </form>

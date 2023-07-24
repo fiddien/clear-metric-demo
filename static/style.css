@@ -1,4 +1,5 @@
 :root {
+	--font-size: 1rem;
 	--font-color: #34343c;
 	--background-light: #f6f8fa;
 	--background-dark: #34343cab;
@@ -15,7 +16,7 @@ body {
 	font-family: 'Source Sans Pro', sans-serif;
 	background: white;
 	color: var(--font-color);
-	font-size: 1.2rem;
+	font-size:  var(--font-size);
 	text-align: left;
 	letter-spacing: 1.2px;
 
@@ -85,7 +86,7 @@ input {
 	border: none;
 	outline: none;
 	padding: 10px;
-	font-size: 1.2rem;
+	font-size: var(--font-size);
 	text-align: center;
 	color: var(--background-dark);
 	border-radius: 0.75rem;
@@ -99,6 +100,23 @@ input {
 
 input:focus { 
 	box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgba(255,255,255,0.2); 
+}
+
+input::placeholder{
+	text-align: center;
+}
+/* or, for legacy browsers */
+::-webkit-input-placeholder {
+text-align: center;
+}
+:-moz-placeholder { /* Firefox 18- */
+text-align: center;  
+}
+::-moz-placeholder {  /* Firefox 19+ */
+text-align: center;  
+}
+:-ms-input-placeholder {  
+text-align: center; 
 }
 
 .btn {
@@ -125,7 +143,7 @@ input:focus {
 .btn-primary { 
 	color: #ececec;
 	background-color: #8e8e8e; 
-	font-size: 1.2rem;
+	font-size: var(--font-size);
 	letter-spacing: .2rem;
 	border-radius: 0.75rem;
 }
@@ -157,7 +175,7 @@ select {
 	border: none;
 	outline: none;
 	padding: 10px;
-	font-size: 1.2rem;
+	font-size: var(--font-size);
 	color: var(--background-dark);
 	border-radius: 0.75rem;
 	box-shadow: inset 0 -5px 45px rgba(100,100,100,0.2), 0 1px 1px rgba(255,255,255,0.2);
@@ -171,7 +189,9 @@ select {
 option {
 	max-width: 100%;
 }
-
+option.option-placeholder {
+	text-align: center;
+}
 
 * { box-sizing:border-box; }
 
@@ -208,23 +228,32 @@ option {
 	max-width: 90%;
 }
 
+.result-box {
+	padding: 0.5rem 1rem;
+	background-color: var(--background-light);
+	line-height: 1;
+	border-radius: 0.35rem;
+	font-size: 0.6em;
+	text-transform: uppercase;
+}
+
 .entities {
 	line-height: 1.5; 
 }
 
 [data-entity] {
-	padding: 0.25em 0.35em;
-	margin: 3px 0.25px 3px 0.25px;
+	padding: 0.10em 0.30em;
+	margin: 3px 0.25px 3px 2.25px;
 	display: inline-block;
 	border-radius: 0.25em;
-	border: 1px solid; 
+	border: 1px solid;
 }
 
 [data-entity]::after {
 	box-sizing: border-box;
 	content: attr(data-entity);
 	font-size: 0.6em;
-	padding: 0.35em;
+	padding: 0.25em;
 	border-radius: 0.35em;
 	text-transform: uppercase;
 	display: inline-block;
@@ -232,21 +261,21 @@ option {
 	margin: 0px 0px 0.1rem 0.5rem; 
 }
 
-[data-entity][data-entity="action"] {
+[data-entity][data-entity="actn"] {
 	background: rgba(13, 211, 79, 0.2);
 	border-color: rgb(13, 211, 79); 
 }
 
-[data-entity][data-entity="action"]::after {
+[data-entity][data-entity="actn"]::after {
 	background: rgb(13, 211, 79); 
 }
 
-[data-entity][data-entity="character"] {
+[data-entity][data-entity="char"] {
 	background: rgba(255, 163, 158, 0.2);
 	border-color: rgb(255, 163, 158); 
 }
 
-[data-entity][data-entity="character"]::after {
+[data-entity][data-entity="char"]::after {
 	background: rgb(255, 163, 158); 
 }
 
@@ -259,11 +288,11 @@ option {
 	background: rgb(36, 200, 255); 
 }
 
-[data-entity][data-entity="subject"] {
+[data-entity][data-entity="subj"] {
 	background: rgba(255, 222, 5, 0.2);
 	border-color: rgb(255, 222, 5); 
 }
 
-[data-entity][data-entity="subject"]::after {
+[data-entity][data-entity="subj"]::after {
 	background: rgb(255, 222, 5); 
 }
