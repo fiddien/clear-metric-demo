@@ -20,6 +20,7 @@ def inference():
             return render_template('index.html', result="")
         sents = example
     sents = re.split('<sep>', sents)
+    print(sents)
     try:
         sents = Sentence(sents)
         scorer = ClearMetric(sents)
@@ -80,5 +81,5 @@ def build_result(sents, scores):
     return s
 
 if __name__=='__main__':
-    # app.run(debug=True, host='0.0.0.0', port=9696)
-    app.run()
+    app.run(debug=True, host='0.0.0.0', port=9696)
+    # app.run()

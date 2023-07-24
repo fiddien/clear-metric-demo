@@ -309,11 +309,11 @@ class Sentence:
 
     def parse_syntax(self, syntax_model, sentences):        
         if isinstance(sentences, list) and isinstance(sentences[0], str):
-            if len(sentences) > 1:
-                for i, sent in enumerate(sentences):
-                    sent = sent.strip()
-                    if sent[-1] not in '.?!':
-                        sentences[i] = sent + '.'
+            # if len(sentences) > 1:
+            for i, sent in enumerate(sentences):
+                sent = sent.strip()
+                if sent[-1] not in '.?!':
+                    sentences[i] = sent + '.'
             sentences_str = " ".join(sentences)
             doc = syntax_model(sentences_str)
             assert len(list(doc.sents)) == len(sentences)

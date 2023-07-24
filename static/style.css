@@ -205,6 +205,7 @@ option {
 	width: var(--site-width);
 	text-align: left;
 	line-height: 1.5;
+	max-width: 90%;
 }
 
 .entities {
