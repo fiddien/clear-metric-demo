@@ -36,13 +36,13 @@ def inference():
 
 
 def build_result(sents, scores):
-
+    
     s = ''
-    i = 0
+    sent_num = 0
     for sent, structure, story, score in \
         zip(sents.doc.sents, sents.structures, sents.stories, scores):
-        i += 1
-        s += f'<h2>Sentence #{i}</h2>\n'
+        sent_num += 1
+        s += f'<h2>Sentence #{sent_num}</h2>\n'
         tokens = [t for t in sent]
         start = sent[0].i
         sent_str = sent.text
