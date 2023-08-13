@@ -391,6 +391,7 @@ class Sentence:
             'prt',
             'neg',
             'ccomp',
+            'npadvmod',
         ]
         for sent in self.doc.sents:
             
@@ -442,7 +443,7 @@ class Sentence:
         for token in verb.children:
             if token.dep_ in dependents:
                 for child in token.subtree:
-                    if child.text in [',', '--', '—', '–']:
+                    if child.text in ['--', '—', '–']:
                          break
                     subject.append(child)
 
